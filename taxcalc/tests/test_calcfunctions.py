@@ -8,7 +8,9 @@ Tests for Tax-Calculator calcfunctions.py logic.
 import os
 import re
 import ast
-from taxcalc import Records  # pylint: disable=import-error
+import numpy as np
+# pylint: disable=import-error
+from taxcalc import Records, calcfunctions  
 
 
 class GetFuncDefs(ast.NodeVisitor):
@@ -161,3 +163,45 @@ def test_function_args_usage(tests_path):
                 msg += 'FUNCTION,ARGUMENT= {} {}\n'.format(fname, arg)
     if found_error:
         raise ValueError(msg)
+
+def test_DependentCare(tests = (3, 2, 100000, 1, [250000, 500000, 
+                                                  250000, 500000, 250000], 
+                                                  .2, 7165, 5000, 0)):
+    """
+    Tests the DependentCare function in calcfunctions.py
+    
+    Note: The tests variable is only 1 of 5 tests I have created. This works
+    when @iterate_jit is removed
+    """
+    
+    test_value = calcfunctions.DependentCare(*tests)
+    expected_value = 25196
+    print(test_value, expected_value)
+    assert np.allclose(test_value, expected_value)
+    
+    """
+    This is what it looks like with every test. I was going to ask how to 
+    refactor this after fixing the decorator issue.
+    
+    tests = [(3, 2, 100000, 1, [250000, 500000, 250000, 500000, 250000], 
+                                                  .2, 7165, 5000, 0),
+
+             (3, 2, 100000, 1, [250000, 500000, 250000, 500000, 250000],
+                                                   1, 7165, 5000, 0),
+                                
+             (3, 2, 600000, 2, [250000, 500000, 250000, 500000, 250000],
+                                                  .2, 7165, 5000, 0),
+                                
+             (5, 0, 250000, 3, [250000, 500000, 250000, 500000, 250000], 
+                                                  .2, 7165, 5000, 0),
+                                
+             (0, 5, 500000, 4, [250000, 500000, 250000, 500000, 250000],
+                                                  .2, 7165, 5000, 0)]
+    
+    test_value = []
+    for item in tests:
+       test_value.append(calcfunctions.DependentCare(*item))
+     expected_value = [25196, 0, 0, 28660, 20000]
+    print(test_value, expected_value)
+    assert np.allclose(test_value, expected_value)
+     """
